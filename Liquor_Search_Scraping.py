@@ -1,11 +1,3 @@
-#conda install pip
-#pip install selenium
-#pip install bs4
-#pip install pandas
-#pip install requests
-#pip install numpy
-#pip install lxml
-
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
