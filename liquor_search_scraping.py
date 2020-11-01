@@ -105,8 +105,3 @@ def scrape_olcc_whiskey_inv(URL): #click through each whiskey and scrape invento
         except NoSuchElementException: # the element wasn't found
             driver.close()
             break # exit from the loop
-
-
-print("Running scrape_olcc_whiskey_list & scrape_olcc_whiskey_inv")
-print(scrape_olcc_whiskey_list("http://www.oregonliquorsearch.com/"))
-# print(scrape_olcc_whiskey_inv("http://www.oregonliquorsearch.com/"))
