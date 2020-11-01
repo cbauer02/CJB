@@ -10,7 +10,7 @@ import lxml.html as lh
 
 
 def scrape_olcc_whiskey_list(URL): #scrape landing whiskey list
-    print("starting whiskey list processing")
+    print("starting whiskey list processing...")
     options = Options()
     options.headless = True
     options.add_argument("--window-size=1920,1200")
@@ -53,9 +53,11 @@ def scrape_olcc_whiskey_list(URL): #scrape landing whiskey list
             i+=1 #Increment i for the next column
     driver.quit()
     whiskey_dict={title:column for (title,column) in booze}
+    print("starting whiskey list processing COMPLETE!")
     return pd.DataFrame(whiskey_dict)
 
 def scrape_olcc_whiskey_inv(URL): #click through each whiskey and scrape inventory
+    print("starting whiskey inv processing...")
     options = Options()
     options.headless = True
     options.add_argument("--window-size=1920,1200")
@@ -99,9 +101,10 @@ def scrape_olcc_whiskey_inv(URL): #click through each whiskey and scrape invento
                     whiskey_inv[i][1].append(data) #Append the data to the empty list of the i'th column
                     i+=1 #Increment i for the next column
             whiskey_inv_dict={title:column for (title,column) in whiskey_inv}
-            return pd.DataFrame(whiskey_inv_dict)
             back_button = driver.back()
             n+=1
+            print("starting whiskey inv processing COMPLETE!")
+            return pd.DataFrame(whiskey_inv_dict)
         except NoSuchElementException: # the element wasn't found
             driver.close()
             break # exit from the loop
