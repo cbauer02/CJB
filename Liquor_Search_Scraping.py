@@ -10,6 +10,7 @@ import lxml.html as lh
 
 
 def scrape_olcc_whiskey_list(URL): #scrape landing whiskey list
+    print("starting whiskey list processing")
     options = Options()
     options.headless = True
     options.add_argument("--window-size=1920,1200")
@@ -52,7 +53,7 @@ def scrape_olcc_whiskey_list(URL): #scrape landing whiskey list
             i+=1 #Increment i for the next column
     driver.quit()
     whiskey_dict={title:column for (title,column) in booze}
-    whiskey_df=pd.DataFrame(whiskey_dict)
+    return pd.DataFrame(whiskey_dict)
 
 def scrape_olcc_whiskey_inv(URL): #click through each whiskey and scrape inventory
     options = Options()
@@ -98,7 +99,7 @@ def scrape_olcc_whiskey_inv(URL): #click through each whiskey and scrape invento
                     whiskey_inv[i][1].append(data) #Append the data to the empty list of the i'th column
                     i+=1 #Increment i for the next column
             whiskey_inv_dict={title:column for (title,column) in whiskey_inv}
-            whiskey_inv_df=pd.DataFrame(whiskey_inv_dict)
+            return pd.DataFrame(whiskey_inv_dict)
             back_button = driver.back()
             n+=1
         except NoSuchElementException: # the element wasn't found
@@ -107,6 +108,6 @@ def scrape_olcc_whiskey_inv(URL): #click through each whiskey and scrape invento
 
 
 print("Running scrape_olcc_whiskey_list & scrape_olcc_whiskey_inv")
-#scrape_olcc_whiskey_list("http://www.oregonliquorsearch.com/")
-#scrape_olcc_whiskey_inv("http://www.oregonliquorsearch.com/")
+print(scrape_olcc_whiskey_list("http://www.oregonliquorsearch.com/"))
+# print(scrape_olcc_whiskey_inv("http://www.oregonliquorsearch.com/"))
 
