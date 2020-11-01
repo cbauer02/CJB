@@ -1,9 +1,14 @@
 # Liquor Search README.md
 
-## SETUP:
-* -python 3
-* -terminal: Anaconda: jupyter
- 
+## Local Development
+
+Run the following command to scrape the `oregonliquorsearch.com` website
+
+```
+python Liquor_Search_Scraping.py
+```
+
+
 ## INSTALLS required:
 
 * https://chromedriver.chromium.org/getting-started
