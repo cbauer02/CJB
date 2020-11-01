@@ -19,7 +19,7 @@ def scrape_olcc_whiskey_list(URL): #scrape landing whiskey list
     click1 = driver.find_element_by_xpath("//input[@name='btnSubmit']").click() #click "I'm 21 or older"
     click2 = driver.find_element_by_xpath("//*[@id='browse-content']/ul[1]/li[5]/a").click() #click "Domestic Whiskey"
     click3 = driver.find_element_by_xpath("//*[@id='browse-content']/ul/li[1]/a").click() #click "Domestic Whiskey - ALL"
-    current_page = driver.page_source                        
+    current_page = driver.page_source
 
     whiskey_doc = lh.fromstring(current_page) #Store the contents of the website under doc
 
@@ -38,12 +38,12 @@ def scrape_olcc_whiskey_list(URL): #scrape landing whiskey list
     for j in range(5,len(tr_elements)):
         T=tr_elements[j] #T is our j'th row
         if len(T)!=7:
-            break #If row is not of size 7, the //tr data is not from our table 
+            break #If row is not of size 7, the //tr data is not from our table
         i=0 #i is the index of our column
 
         #Iterate through each element of the row
         for t in T.iterchildren():
-            data=t.text_content() 
+            data=t.text_content()
             if i>0: #Check if row is empty
                 try:
                     data=int(data) #Convert any numerical value to integers
@@ -85,12 +85,12 @@ def scrape_olcc_whiskey_inv(URL): #click through each whiskey and scrape invento
             for j in range(11,len(tr_elements_1)):
                 T=tr_elements_1[j] #T is our j'th row
                 if len(T)!=7:
-                    break #If row is not of size 7, the //tr data is not from our table 
+                    break #If row is not of size 7, the //tr data is not from our table
                 i=0 #i is the index of our column
 
                 #Iterate through each element of the row
                 for t in T.iterchildren():
-                    data=t.text_content() 
+                    data=t.text_content()
                     if i>0: #Check if row is empty
                         try:
                             data=int(data) #Convert any numerical value to integers
@@ -110,4 +110,3 @@ def scrape_olcc_whiskey_inv(URL): #click through each whiskey and scrape invento
 print("Running scrape_olcc_whiskey_list & scrape_olcc_whiskey_inv")
 print(scrape_olcc_whiskey_list("http://www.oregonliquorsearch.com/"))
 # print(scrape_olcc_whiskey_inv("http://www.oregonliquorsearch.com/"))
-
