@@ -1,28 +1,19 @@
 # Liquor Search README.md
 
+## Dependencies
+Install the required Python packages with this command
+```
+sudo pip3 install selenium bs4 pandas requests numpy lxml chromedriver-py
+```
+To support selenium, you also need to install the chrome webdrivers https://sites.google.com/a/chromium.org/chromedriver/downloads.
+
 ## Local Development
 
 Run the following command to scrape the `oregonliquorsearch.com` website
 
 ```
-python Liquor_Search_Scraping.py
+python3 src/main.py
 ```
-
-
-## INSTALLS required:
-
-* https://chromedriver.chromium.org/getting-started
-* #conda install pip
-* #pip install selenium
-* #pip install bs4
-* #pip install pandas
-* #pip install requests
-* #pip install numpy
-* #pip install lxml
-
-## How do I run the script in the terminal?
-
-* liquor_search_scraping.py
 
 ## DATABASE schema:
 
