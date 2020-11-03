@@ -3,7 +3,7 @@
 ## Dependencies
 Install the required Python packages with this command
 ```
-sudo pip3 install selenium bs4 pandas requests numpy lxml chromedriver-py
+sudo pip3 install selenium bs4 pandas requests numpy lxml
 ```
 To support selenium, you also need to install the chrome webdrivers https://sites.google.com/a/chromium.org/chromedriver/downloads.
 
