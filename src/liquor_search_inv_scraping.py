@@ -1,3 +1,13 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.by import By
+from bs4 import BeautifulSoup
+import pandas as pd
+import requests
+import numpy as np
+import lxml.html as lh
+
 def scrape_olcc_whiskey_inv(URL): #click through each whiskey and scrape inventory
     print("starting whiskey inv processing...")
     options = Options()
