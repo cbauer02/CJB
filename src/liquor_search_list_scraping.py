@@ -3,7 +3,7 @@ def scrape_olcc_whiskey_list(URL): #scrape landing whiskey list
     options = Options()
     options.headless = True
     options.add_argument("--window-size=1920,1200")
-    driver = webdriver.Chrome(options=options, executable_path=r'/Users/kennacrispin/Downloads/chromedriver 3') #webdriver ran from local executable_path
+    driver = webdriver.Chrome(options=options)
     driver.get(URL)
     click1 = driver.find_element_by_xpath("//input[@name='btnSubmit']").click() #click "I'm 21 or older"
     click2 = driver.find_element_by_xpath("//*[@id='browse-content']/ul[1]/li[5]/a").click() #click "Domestic Whiskey"
