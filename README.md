@@ -7,6 +7,10 @@ sudo pip3 install selenium bs4 pandas requests numpy lxml
 ```
 To support selenium, you also need to install the chrome webdrivers https://sites.google.com/a/chromium.org/chromedriver/downloads.
 
+For mac users run
+```
+brew cask install chromedriver
+```
 ## Local Development
 
 Run the following command to scrape the `oregonliquorsearch.com` website
@@ -48,5 +52,3 @@ CREATE TABLE whiskey_inv (
     FOREIGN KEY(item_code) REFERENCES whiskey_list(item_code) ON DELETE SET NULL,
     FOREIGN KEY(store_no) REFERENCES liquor_stores(store_no) ON DELETE SET NULL
 );
-
-
