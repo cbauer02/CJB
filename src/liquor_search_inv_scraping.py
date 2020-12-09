@@ -16,10 +16,10 @@ def scrape_olcc_whiskey_inv(URL):
     # clicking through age verification page, and to whiskey page
     print("starting whiskey inv processing...")
     options = Options()
-    options.headless = True
+    options.headless = True #comment out to view browser navigation
     options.add_argument("--window-size=1920,1200")
     driver = webdriver.Chrome(options=options)
-    driver.get("http://www.oregonliquorsearch.com/")
+    driver.get(URL)
     click1 = driver.find_element_by_xpath("//input[@name='btnSubmit']").click() #click "I'm 21 or older"
     click2 = driver.find_element_by_xpath("//*[@id='browse-content']/ul[1]/li[5]/a").click() #click "Domestic Whiskey"
     click3 = driver.find_element_by_xpath("//*[@id='browse-content']/ul/li[1]/a").click() #click "Domestic Whiskey - ALL"
@@ -40,6 +40,7 @@ def scrape_olcc_whiskey_inv(URL):
         name=t.text_content()
         whiskey_inv.append((name,[]))
     print("scraped headers:", whiskey_inv)
+    back_button = driver.back()
 
     # Store the contents of the website under doc
     # Parse through the //tr elements
@@ -79,10 +80,12 @@ def scrape_olcc_whiskey_inv(URL):
                     whiskey_inv[i][1].append(data)
                     i+=1
 
+            # save data into data dictionary and dataframe
+            # print the whiskey that was just scrapped
             whiskey_inv_dict={title:column for (title,column) in whiskey_inv}
+            whiskey_df = pd.DataFrame(whiskey_inv_dict)
             whiskey_name = driver.find_element_by_xpath("//*[@id='product-desc']/h2")
             print("scrapped inv of whiskey =" + str(whiskey_name.text))
-            whiskey_df = pd.DataFrame(whiskey_inv_dict)
             back_button = driver.back()
             n+=1
             print("Collected " + str(len(tr_elements_1)-11-1) + "rows")
@@ -94,5 +97,8 @@ def scrape_olcc_whiskey_inv(URL):
             print("There are no remaining whiskeys to scrape.  Exiting function.")
             break
 
-    print("starting whiskey inv processing COMPLETE!")
+        finally:
+            return(whiskey_df)
+
     whiskey_df.head()
+    print("starting whiskey inv processing COMPLETE!")
