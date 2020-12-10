@@ -14,6 +14,7 @@ def scrape_olcc_whiskey_inv(URL):
 
     # setting up selenium web scraper parameters
     # clicking through age verification page, and to whiskey page
+    # create blank list to store date in
     print("starting whiskey inv processing...")
     options = Options()
     options.headless = True #comment out to view browser navigation
@@ -26,9 +27,9 @@ def scrape_olcc_whiskey_inv(URL):
     whiskey_inv=[]
     whiskey_inv.clear()
 
-    # Scrape headers' clicks
-    # Store the contents of the website under doc
-    # Parse through the //tr elements
+    # click to scrape headers and inventory
+    # store the contents of the website under doc
+    # parse through the //tr elements
     click_n = driver.find_element_by_xpath(f"//*[@id='browse-content']/table/tbody/tr[2]/td[1]/span").click()
     current_page = driver.page_source
     whiskey_list_doc = lh.fromstring(current_page)
@@ -42,8 +43,8 @@ def scrape_olcc_whiskey_inv(URL):
     print("scraped headers:", whiskey_inv)
     back_button = driver.back()
 
-    # Store the contents of the website under doc
-    # Parse through the //tr elements
+    # store the contents of the website under doc
+    # parse through the //tr elements
     n=2
     while n<10:
         try:
@@ -57,21 +58,21 @@ def scrape_olcc_whiskey_inv(URL):
             for j in range(11,len(tr_elements_1)):
                 T=tr_elements_1[j]
 
-                # If row is not of size 7,
+                # if row is not of size 7,
                 # the //tr data is not from our table
                 if len(T)!=7:
                     break
                 i=0
 
-                # Iterate through each column value
-                # Append the data to the empty list of the i'th column
+                # iterate through each column value
+                # append the data to the empty list of the i'th column
                 for t in T.iterchildren():
                     data=t.text_content()
 
-                    # Check if row is empty
-                    # Convert any numerical value to integers
-                    # Append data into whiskey_inv list
-                    # Increment i for the next column
+                    # check if row is empty
+                    # convert any numerical value to integers
+                    # append data into whiskey_inv list
+                    # increment i for the next column
                     if i>0:
                         try:
                             data=int(data)
@@ -90,15 +91,12 @@ def scrape_olcc_whiskey_inv(URL):
             n+=1
             print("Collected " + str(len(tr_elements_1)-11-1) + "rows")
 
-        # If the element isn't found,
+        # if the element isn't found,
         # exit from the loop
         except NoSuchElementException:
             driver.close()
             print("There are no remaining whiskeys to scrape.  Exiting function.")
             break
 
-        finally:
-            return(whiskey_df)
-
-    whiskey_df.head()
     print("starting whiskey inv processing COMPLETE!")
+    print(whiskey_df)
