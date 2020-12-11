@@ -8,55 +8,95 @@ import requests
 import numpy as np
 import lxml.html as lh
 
-def scrape_olcc_whiskey_inv(URL): #click through each whiskey and scrape inventory
+
+#click through each whiskey and scrape inventory
+def scrape_olcc_whiskey_inv(URL):
+
+    # setting up selenium web scraper parameters
+    # clicking through age verification page, and to whiskey page
+    # create blank list to store date in
     print("starting whiskey inv processing...")
     options = Options()
-    options.headless = True
+    options.headless = True #comment out to view browser navigation
     options.add_argument("--window-size=1920,1200")
     driver = webdriver.Chrome(options=options)
     driver.get(URL)
     click1 = driver.find_element_by_xpath("//input[@name='btnSubmit']").click() #click "I'm 21 or older"
     click2 = driver.find_element_by_xpath("//*[@id='browse-content']/ul[1]/li[5]/a").click() #click "Domestic Whiskey"
     click3 = driver.find_element_by_xpath("//*[@id='browse-content']/ul/li[1]/a").click() #click "Domestic Whiskey - ALL"
-
-    n=2
-    whiskey_inv=[] #Create empty list
+    whiskey_inv=[]
     whiskey_inv.clear()
 
-    while n<10: #scraping 10 whiskeys, as a test. loop is scraping blank lists into whiskey_inv causing nothing to be inserted into whiskey_inv_df
+    # click to scrape headers and inventory
+    # store the contents of the website under doc
+    # parse through the //tr elements
+    click_n = driver.find_element_by_xpath(f"//*[@id='browse-content']/table/tbody/tr[2]/td[1]/span").click()
+    current_page = driver.page_source
+    whiskey_list_doc = lh.fromstring(current_page)
+    tr_elements_1 = whiskey_list_doc.xpath('//tr')
+
+    # loop over olcc whiskey table and scrap headers,
+    # append whiskey_ inv list with column headers
+    for t in tr_elements_1[10]:
+        name=t.text_content()
+        whiskey_inv.append((name,[]))
+    print("scraped headers:", whiskey_inv)
+    back_button = driver.back()
+
+    # store the contents of the website under doc
+    # parse through the //tr elements
+    n=2
+    while n<10:
         try:
             click_n = driver.find_element_by_xpath(f"//*[@id='browse-content']/table/tbody/tr[{n}]/td[1]/span").click()
-            #time.sleep(5)
             current_page = driver.page_source
-            whiskey_list_doc = lh.fromstring(current_page) #Store the contents of the website under doc
-            tr_elements_1 = whiskey_list_doc.xpath('//tr') #Parse data that are stored between <tr>..</tr> of HTML
-            #For each row, store each first element (header) and an empty list
-            for t in tr_elements_1[10]:
-                name=t.text_content()
-                whiskey_inv.append((name,[]))
+            whiskey_list_doc = lh.fromstring(current_page)
+            tr_elements_1 = whiskey_list_doc.xpath('//tr')
 
-            #Since our first row is the header, data is stored on the second row onwards
+            # iterate throught each //tr row and check for data
+            # T is the tr_element of our j'th row
             for j in range(11,len(tr_elements_1)):
-                T=tr_elements_1[j] #T is our j'th row
-                if len(T)!=7:
-                    break #If row is not of size 7, the //tr data is not from our table
-                i=0 #i is the index of our column
+                T=tr_elements_1[j]
 
-                #Iterate through each element of the row
+                # if row is not of size 7,
+                # the //tr data is not from our table
+                if len(T)!=7:
+                    break
+                i=0
+
+                # iterate through each column value
+                # append the data to the empty list of the i'th column
                 for t in T.iterchildren():
                     data=t.text_content()
-                    if i>0: #Check if row is empty
+
+                    # check if row is empty
+                    # convert any numerical value to integers
+                    # append data into whiskey_inv list
+                    # increment i for the next column
+                    if i>0:
                         try:
-                            data=int(data) #Convert any numerical value to integers
+                            data=int(data)
                         except:
                             pass
-                    whiskey_inv[i][1].append(data) #Append the data to the empty list of the i'th column
-                    i+=1 #Increment i for the next column
+                    whiskey_inv[i][1].append(data)
+                    i+=1
+
+            # save data into data dictionary and dataframe
+            # print the whiskey that was just scrapped
             whiskey_inv_dict={title:column for (title,column) in whiskey_inv}
+            whiskey_df = pd.DataFrame(whiskey_inv_dict)
+            whiskey_name = driver.find_element_by_xpath("//*[@id='product-desc']/h2")
+            print("scrapped inv of whiskey =" + str(whiskey_name.text))
             back_button = driver.back()
             n+=1
-            print("starting whiskey inv processing COMPLETE!")
-            return pd.DataFrame(whiskey_inv_dict)
-        except NoSuchElementException: # the element wasn't found
+            print("Collected " + str(len(tr_elements_1)-11-1) + "rows")
+
+        # if the element isn't found,
+        # exit from the loop
+        except NoSuchElementException:
             driver.close()
-            break # exit from the loop
+            print("There are no remaining whiskeys to scrape.  Exiting function.")
+            break
+
+    print("starting whiskey inv processing COMPLETE!")
+    print(whiskey_df)
