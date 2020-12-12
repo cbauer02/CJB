@@ -46,11 +46,12 @@ def scrape_olcc_whiskey_inv(URL):
 
     # store the contents of the website under doc
     # iterate through the //tr elements
-    n=2
+    n = 2
     while n<10:
         try:
-            click_n = driver.find_element_by_xpath(f"//*[@id='browse-content']/table/tbody/tr[{n}]/td[1]/span").click()
-            #print(f"clicked {n-1} whiskey")
+            click_whiskey = driver.find_element_by_xpath(f"//*[@id='browse-content']/table/tbody/tr[{n}]/td[1]/span").click()
+            click_results_per_page = driver.find_element_by_xpath("//*[@id='rpp']/select").click()
+            click_100 = driver.find_element_by_xpath("//*[@id='rpp']/select/option[4]").click()
             current_page = driver.page_source
             whiskey_list_doc = lh.fromstring(current_page)
             tr_elements_1 = whiskey_list_doc.xpath('//tr')
@@ -90,7 +91,7 @@ def scrape_olcc_whiskey_inv(URL):
 
                 # try to find next page in pagination, if not found exit loop
                 try:
-                    time.sleep(5)
+                    time.sleep(3)
                     driver.find_element_by_link_text(str(page_count)).click()
                 except NoSuchElementException:
                     print(f"Exiting. Last page: {page_count-1}.")
