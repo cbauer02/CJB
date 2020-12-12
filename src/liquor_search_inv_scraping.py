@@ -7,7 +7,7 @@ import pandas as pd
 import requests
 import numpy as np
 import lxml.html as lh
-
+import time
 
 #click through each whiskey and scrape inventory
 def scrape_olcc_whiskey_inv(URL):
@@ -26,8 +26,9 @@ def scrape_olcc_whiskey_inv(URL):
     click3 = driver.find_element_by_xpath("//*[@id='browse-content']/ul/li[1]/a").click() #click "Domestic Whiskey - ALL"
     whiskey_inv=[]
     whiskey_inv.clear()
+    whiskey_df = pd.DataFrame()
 
-    # click to scrape headers and inventory
+    # click to scrape headers
     # store the contents of the website under doc
     # parse through the //tr elements
     click_n = driver.find_element_by_xpath(f"//*[@id='browse-content']/table/tbody/tr[2]/td[1]/span").click()
@@ -44,42 +45,56 @@ def scrape_olcc_whiskey_inv(URL):
     back_button = driver.back()
 
     # store the contents of the website under doc
-    # parse through the //tr elements
+    # iterate through the //tr elements
     n=2
     while n<10:
         try:
             click_n = driver.find_element_by_xpath(f"//*[@id='browse-content']/table/tbody/tr[{n}]/td[1]/span").click()
+            #print(f"clicked {n-1} whiskey")
             current_page = driver.page_source
             whiskey_list_doc = lh.fromstring(current_page)
             tr_elements_1 = whiskey_list_doc.xpath('//tr')
+            page_count = 1
 
-            # iterate throught each //tr row and check for data
-            # T is the tr_element of our j'th row
-            for j in range(11,len(tr_elements_1)):
-                T=tr_elements_1[j]
+            # interate through pagination
+            while True:
+                page_count += 1
 
-                # if row is not of size 7,
-                # the //tr data is not from our table
-                if len(T)!=7:
+                # iterate throught each //tr row and check for data
+                # T is the tr_element of our j'th row
+                for j in range(11,len(tr_elements_1)):
+                    T=tr_elements_1[j]
+
+                    # if row is not of size 7,
+                    # the //tr data is not from our table
+                    if len(T)!=7:
+                        break
+                    i=0
+
+                    # iterate through each column value
+                    # append the data to the empty list of the i'th column
+                    for t in T.iterchildren():
+                        data=t.text_content()
+
+                        # check if row is empty
+                        # convert any numerical value to integers
+                        # append data into whiskey_inv list
+                        # increment i for the next column
+                        if i>0:
+                            try:
+                                data=int(data)
+                            except:
+                                pass
+                        whiskey_inv[i][1].append(data)
+                        i+=1
+
+                # try to find next page in pagination, if not found exit loop
+                try:
+                    time.sleep(5)
+                    driver.find_element_by_link_text(str(page_count)).click()
+                except NoSuchElementException:
+                    print(f"Exiting. Last page: {page_count-1}.")
                     break
-                i=0
-
-                # iterate through each column value
-                # append the data to the empty list of the i'th column
-                for t in T.iterchildren():
-                    data=t.text_content()
-
-                    # check if row is empty
-                    # convert any numerical value to integers
-                    # append data into whiskey_inv list
-                    # increment i for the next column
-                    if i>0:
-                        try:
-                            data=int(data)
-                        except:
-                            pass
-                    whiskey_inv[i][1].append(data)
-                    i+=1
 
             # save data into data dictionary and dataframe
             # print the whiskey that was just scrapped
@@ -87,7 +102,7 @@ def scrape_olcc_whiskey_inv(URL):
             whiskey_df = pd.DataFrame(whiskey_inv_dict)
             whiskey_name = driver.find_element_by_xpath("//*[@id='product-desc']/h2")
             print("scrapped inv of whiskey =" + str(whiskey_name.text))
-            back_button = driver.back()
+            driver.get("http://www.oregonliquorsearch.com/servlet/FrontController?view=browsecategoriesallsubcategories&action=select&category=DOMESTIC%20WHISKEY")
             n+=1
             print("Collected " + str(len(tr_elements_1)-11-1) + "rows")
 
@@ -95,7 +110,7 @@ def scrape_olcc_whiskey_inv(URL):
         # exit from the loop
         except NoSuchElementException:
             driver.close()
-            print("There are no remaining whiskeys to scrape.  Exiting function.")
+            print("There are no more whiskeys found.  Exiting function.")
             break
 
     print("starting whiskey inv processing COMPLETE!")
